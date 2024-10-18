@@ -33,6 +33,11 @@ class decision_maker(Node):
 
         publishing_period=1/rate
         
+        #Threshold for goal pose error
+        self.threshold_lin = 1
+        self.threshold_ang = 0.5
+        self.traj_index = 0
+
         # Instantiate the controller
         # TODO Part 5: Tune your parameters here
     
@@ -61,8 +66,9 @@ class decision_maker(Node):
 
     def timerCallback(self):
         
-        # TODO Part 3: Run the localization node
-        ...    # Remember that this file is already running the decision_maker node.
+        # DONE Part 3: Run the localization node
+        # Remember that this file is already running the decision_maker node.
+        spin_once(self.localizer)
 
         if self.localizer.getPose()  is  None:
             print("waiting for odom msgs ....")
@@ -70,11 +76,29 @@ class decision_maker(Node):
 
         vel_msg=Twist()
         
-        # TODO Part 3: Check if you reached the goal
+        # DONE Part 3: Check if you reached the goal
+        reached_goal = False
+        curr_pose = self.localizer.getPose()
+
+        #Trajectory is of type list, Point is else
         if type(self.goal) == list:
-            reached_goal=...
-        else: 
-            reached_goal=...
+            # Trajectory
+            # Check that the linear error and the angular error are within the threshold
+            # for the current target point in the trajectory
+            if (error_linear(curr_pose, self.goal[self.traj_index]) < self.threshold_lin
+            and error_angular(curr_pose, self.goal[self.traj_index]) < self.threshold_ang):
+                # True if this is the last point in the trajectory list
+                # (length of list is 1 greater than last index of list)
+                if (self.traj_index + 1 == len(self.goal)):
+                    reached_goal = True
+                    self.traj_index = 0
+                else:
+                    # Otherwise increment to next point in the trajectory
+                    self.traj_index += 1
+        else:
+            #Point
+            if (error_linear(curr_pose, self.goal) < self.threshold_lin and error_angular(curr_pose, self.goal) < self.threshold_ang):
+                reached_goal = True
         
 
         if reached_goal:
@@ -84,8 +108,9 @@ class decision_maker(Node):
             self.controller.PID_angular.logger.save_log()
             self.controller.PID_linear.logger.save_log()
             
-            #TODO Part 3: exit the spin
-            ... 
+            # DONE Part 3: exit the spin
+            # Might be wrong
+            raise SystemExit
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
@@ -99,7 +124,7 @@ def main(args=None):
     
     init()
 
-    # TODO Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
+    # DONE Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
     
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
