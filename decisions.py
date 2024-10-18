@@ -35,7 +35,7 @@ class decision_maker(Node):
         publishing_period=1/rate
         
         #Threshold for goal pose error
-        self.threshold_lin = 0.1
+        self.threshold_lin = 0.5
         self.threshold_ang = 0.1
         self.traj_index = 0
 
@@ -86,8 +86,7 @@ class decision_maker(Node):
             # Trajectory
             # Check that the linear error and the angular error are within the threshold
             # for the current target point in the trajectory
-            if (calculate_linear_error(curr_pose, self.goal[self.traj_index]) < self.threshold_lin
-            and calculate_angular_error(curr_pose, self.goal[self.traj_index]) < self.threshold_ang):
+            if (calculate_linear_error(curr_pose, self.goal[self.traj_index]) < self.threshold_lin):
                 # True if this is the last point in the trajectory list
                 # (length of list is 1 greater than last index of list)
                 if (self.traj_index + 1 == len(self.goal)):
@@ -145,7 +144,7 @@ def main(args=None):
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
     
 
-    # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
+    # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
         # Third argument has an associated assumption in decision_maker class that qos_publisher
         # [1.0, -1.0] is the point we are going towards
@@ -155,9 +154,14 @@ def main(args=None):
                           goalPoint=[1.0, -1.0],
                           rate=10,
                           motion_type=POINT_PLANNER)
-    # TODO Part 5: Tyler added to add instantiating message for trajectory case
+    # DONE Part 4: Tyler added to add instantiating message for trajectory case
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(...)
+        DM=decision_maker(publisher_msg=Twist,
+                          publishing_topic='/cmd_vel',
+                          qos_publisher=10,
+                          goalPoint=[1.0, -1.0],
+                          rate=10,
+                          motion_type=TRAJECTORY_PLANNER)
     else:
         print("invalid motion type", file=sys.stderr)        
     

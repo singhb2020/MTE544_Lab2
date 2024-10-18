@@ -1,3 +1,5 @@
+from numpy import exp, linspace
+
 # Type of planner
 POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
@@ -23,9 +25,23 @@ class planner:
         y = goalPoint[1]
         return x, y
 
-    # TODO Part 6: Implement the trajectories here
+    # DONE Part 6: Implement the trajectories here
     def trajectory_planner(self):
-        pass
         # the return should be a list of trajectory points: [ [x1,y1], ..., [xn,yn]]
-        # return 
+
+        #parabola
+        def func1():
+            #Step chosen arbitrarily
+            #start=0, stop=1.5, samples=100
+            full_range = linspace(start=0, stop=1.1, num=100)
+            return [[i, i**2] for i in full_range]
+        
+        #sigmoid
+        def func2():
+            #Step chosen arbitrarily
+            #start=0, stop=2.5, samples=100
+            full_range = linspace(start=0, stop=2.5, num=100)
+            return [[i, 2 * (1 + exp(-2 * i)) - 1] for i in full_range]
+
+        return func1()
 
