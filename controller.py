@@ -8,6 +8,10 @@ M_PI=3.1415926535
 
 P=0; PD=1; PI=2; PID=3
 
+# Max velocities
+max_lin_vel = 0.31 # Assumed to be in m/s (0.22 in sim)
+max_ang_vel = 1.90 # Assumed to be in rad/s (2.84 in sim)
+
 class controller:
     
     
@@ -17,7 +21,6 @@ class controller:
         # TODO Part 5 and 6: Modify the below lines to test your PD, PI, and PID controller
         self.PID_linear=PID_ctrl(P, klp, klv, kli, filename_="linear.csv")
         self.PID_angular=PID_ctrl(P, kap, kav, kai, filename_="angular.csv")
-
     
     def vel_request(self, pose, goal, status):
         
@@ -28,10 +31,10 @@ class controller:
         linear_vel=self.PID_linear.update([e_lin, pose[3]], status)
         angular_vel=self.PID_angular.update([e_ang, pose[3]], status)
         
-        # TODO Part 4: Add saturation limits for the robot linear and angular velocity
+        # DONE Part 4: Add saturation limits for the robot linear and angular velocity
 
-        linear_vel = ... if linear_vel > 1.0 else linear_vel
-        angular_vel= ... if angular_vel > 1.0 else angular_vel
+        linear_vel = max_lin_vel if linear_vel > max_lin_vel else linear_vel
+        angular_vel= max_ang_vel if angular_vel > max_ang_vel else angular_vel
         
         return linear_vel, angular_vel
     

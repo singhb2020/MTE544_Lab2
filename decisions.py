@@ -20,6 +20,7 @@ from controller import controller, trajectoryController
 
 # You may add any other imports you may need/want to use below
 # import ...
+from numpy import cos, sin
 
 
 class decision_maker(Node):
@@ -28,14 +29,14 @@ class decision_maker(Node):
 
         super().__init__("decision_maker")
 
-        #TODO Part 4: Create a publisher for the topic responsible for robot's motion
-        self.publisher=... 
+        # DONE Part 4: Create a publisher for the topic responsible for robot's motion
+        self.publisher=self.create_publisher(publisher_msg, publishing_topic, qos_publisher)
 
         publishing_period=1/rate
         
         #Threshold for goal pose error
-        self.threshold_lin = 1
-        self.threshold_ang = 0.5
+        self.threshold_lin = 0.1
+        self.threshold_ang = 0.1
         self.traj_index = 0
 
         # Instantiate the controller
@@ -85,8 +86,8 @@ class decision_maker(Node):
             # Trajectory
             # Check that the linear error and the angular error are within the threshold
             # for the current target point in the trajectory
-            if (error_linear(curr_pose, self.goal[self.traj_index]) < self.threshold_lin
-            and error_angular(curr_pose, self.goal[self.traj_index]) < self.threshold_ang):
+            if (calculate_linear_error(curr_pose, self.goal[self.traj_index]) < self.threshold_lin
+            and calculate_angular_error(curr_pose, self.goal[self.traj_index]) < self.threshold_ang):
                 # True if this is the last point in the trajectory list
                 # (length of list is 1 greater than last index of list)
                 if (self.traj_index + 1 == len(self.goal)):
@@ -97,7 +98,7 @@ class decision_maker(Node):
                     self.traj_index += 1
         else:
             #Point
-            if (error_linear(curr_pose, self.goal) < self.threshold_lin and error_angular(curr_pose, self.goal) < self.threshold_ang):
+            if (calculate_linear_error(curr_pose, self.goal) < self.threshold_lin and calculate_angular_error(curr_pose, self.goal) < self.threshold_ang):
                 reached_goal = True
         
 
@@ -114,8 +115,22 @@ class decision_maker(Node):
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
-        #TODO Part 4: Publish the velocity to move the robot
-        ... 
+        # DONE Part 4: Publish the velocity to move the robot
+
+        # Get the current theta relative to the global frame
+        theta = self.localizer.getPose()[2]
+
+        # Calculate the x and y components of the velocity
+        x_vel = velocity * cos(theta)
+        y_vel = velocity * sin(theta)
+
+        # Add the linear and angular velocities to the twist message
+        vel_msg.linear.x = x_vel
+        vel_msg.linear.y = y_vel
+        vel_msg.angular.z = yaw_rate       
+
+        # Publish the twist message
+        self.publisher.publish(vel_msg)
 
 import argparse
 
@@ -132,7 +147,15 @@ def main(args=None):
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
-        DM=decision_maker(...)
+        # Third argument has an associated assumption in decision_maker class that qos_publisher
+        # [1.0, -1.0] is the point we are going towards
+        DM=decision_maker(publisher_msg=Twist,
+                          publishing_topic='/cmd_vel',
+                          qos_publisher=10,
+                          goalPoint=[1.0, -1.0],
+                          rate=10,
+                          motion_type=POINT_PLANNER)
+    # TODO Part 5: Tyler added to add instantiating message for trajectory case
     elif args.motion.lower() == "trajectory":
         DM=decision_maker(...)
     else:
