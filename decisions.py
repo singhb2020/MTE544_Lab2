@@ -35,7 +35,7 @@ class decision_maker(Node):
         publishing_period=1/rate
         
         #Threshold for goal pose error
-        self.threshold_lin = 0.2
+        self.threshold_lin = 0.5
         self.threshold_ang = 0.1
         self.traj_index = 0
 
