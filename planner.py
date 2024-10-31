@@ -33,14 +33,14 @@ class planner:
         def func1():
             #Step chosen arbitrarily
             #start=0, stop=1.5, samples=100
-            full_range = linspace(start=0, stop=1.1, num=100)
+            full_range = linspace(start=0, stop=1.1, num=20)
             return [[i, i**2] for i in full_range]
         
         #sigmoid
         def func2():
             #Step chosen arbitrarily
             #start=0, stop=2.5, samples=100
-            full_range = linspace(start=0, stop=2.5, num=100)
+            full_range = linspace(start=0, stop=2.5, num=20)
             return [[i, 2 * (1 + exp(-2 * i)) - 1] for i in full_range]
 
         return func1()
