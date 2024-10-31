@@ -35,20 +35,20 @@ class decision_maker(Node):
         publishing_period=1/rate
         
         #Threshold for goal pose error
-        self.threshold_lin = 0.5
-        self.threshold_ang = 0.1
+        self.threshold_lin = 0.3
+        self.threshold_ang = 1
         self.traj_index = 0
 
         # Instantiate the controller
         # TODO Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=controller(klp=0.2, klv=0.1, kli=0.1, kap=0.5, kav=0.6, kai=0.5)
             self.planner=planner(POINT_PLANNER)    
     
     
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=0.17, klv=0.15, kli=0.1, kap=1.2, kav=0.2, kai=0.1)
             self.planner=planner(TRAJECTORY_PLANNER)
 
         else:
@@ -119,14 +119,9 @@ class decision_maker(Node):
         # Get the current theta relative to the global frame
         theta = self.localizer.getPose()[2]
 
-        # Calculate the x and y components of the velocity
-        x_vel = velocity * cos(theta)
-        y_vel = velocity * sin(theta)
-
         # Add the linear and angular velocities to the twist message
-        vel_msg.linear.x = x_vel
-        vel_msg.linear.y = y_vel
-        vel_msg.angular.z = yaw_rate       
+        vel_msg.linear.x = velocity
+        vel_msg.angular.z = yaw_rate
 
         # Publish the twist message
         self.publisher.publish(vel_msg)
