@@ -1,10 +1,14 @@
 import matplotlib.pyplot as plt
 from utilities import FileReader
+from numpy import linspace, exp
 
 
 
 
 def plot_errors(filename):
+
+    full_range = linspace(start=0, stop=2.5, num=20)
+    sig = [[i, 2 * (1 + exp(-2 * i)) - 1] for i in full_range]
     
     headers, values=FileReader(filename).read_file()
     
@@ -21,6 +25,7 @@ def plot_errors(filename):
 
 
     axes[0].plot([lin[0] for lin in values], [lin[1] for lin in values])
+    #axes[0].scatterplot(sig[0], sig[1])
     axes[0].set_title("state space")
     axes[0].grid()
 
