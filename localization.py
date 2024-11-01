@@ -19,6 +19,7 @@ class localization(Node):
         # DONE Part 3: Define the QoS profile variable based on whether you are using the simulation (Turtlebot 3 Burger) or the real robot (Turtlebot 4)
         # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
 
+        # QOS profile for real robot
         odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
         
         self.loc_logger=Logger("robot_pose.csv", ["x", "y", "theta", "stamp"])
@@ -38,6 +39,8 @@ class localization(Node):
         y = pose_msg.pose.pose.position.y
         th = euler_from_quaternion(pose_msg.pose.pose.orientation)
         timestamp = pose_msg.header.stamp
+
+        # Store in pose
         self.pose=[ x, y, th, timestamp ]
         
         # Log the data

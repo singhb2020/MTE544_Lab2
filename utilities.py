@@ -96,6 +96,7 @@ def euler_from_quaternion(quat):
     z = quat.z
     w = quat.w
 
+    # Formula for yaw
     siny_cosp = 2 * (w * z + x * y)
     cosy_cosp = 1- 2 * (y * y + z * z)
     yaw = atan2(siny_cosp, cosy_cosp)

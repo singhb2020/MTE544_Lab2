@@ -9,8 +9,8 @@ M_PI=3.1415926535
 P=0; PD=1; PI=2; PID=3
 
 # Max velocities
-max_lin_vel = 0.31 # Assumed to be in m/s (0.22 in sim)
-max_ang_vel = 1.90 # Assumed to be in rad/s (2.84 in sim)
+max_lin_vel = 0.31 # In m/s (0.22 in sim)
+max_ang_vel = 1.90 # In rad/s (2.84 in sim)
 
 class controller:
     
@@ -18,7 +18,7 @@ class controller:
     # Default gains of the controller for linear and angular motions
     def __init__(self, klp=0.2, klv=0.2, kli=0.2, kap=0.2, kav=0.2, kai=0.2):
         
-        # TODO Part 5 and 6: Modify the below lines to test your PD, PI, and PID controller
+        # DONE Part 5 and 6: Modify the below lines to test your PD, PI, and PID controller
         self.PID_linear=PID_ctrl(PID, klp, klv, kli, filename_="linear.csv")
         self.PID_angular=PID_ctrl(PID, kap, kav, kai, filename_="angular.csv")
     
@@ -32,11 +32,14 @@ class controller:
         angular_vel=self.PID_angular.update([e_ang, pose[3]], status)
         
         # DONE Part 4: Add saturation limits for the robot linear and angular velocity
+
+        # If exceeding limits in positive or negative direction then assign the value to the limit exceeded
         if linear_vel > max_lin_vel:
             linear_vel = max_lin_vel
         elif linear_vel < -max_lin_vel:
             linear_vel = -max_lin_vel
 
+        # If exceeding limits in positive or negative direction then assign the value to the limit exceeded
         if angular_vel > max_ang_vel:
             angular_vel = max_ang_vel
         elif angular_vel < -max_ang_vel:
@@ -67,8 +70,13 @@ class trajectoryController(controller):
 
         # DONE Part 5: Add saturation limits for the robot linear and angular velocity
 
+        # If exceeding limits in positive or negative direction then assign the value to the limit exceeded
         linear_vel = max_lin_vel if linear_vel > max_lin_vel else linear_vel
+        linear_vel = -max_lin_vel if linear_vel < -max_lin_vel else linear_vel
+
+        # If exceeding limits in positive or negative direction then assign the value to the limit exceeded
         angular_vel= max_ang_vel if angular_vel > max_ang_vel else angular_vel
+        angular_vel= -max_ang_vel if angular_vel < -max_ang_vel else angular_vel
         
         return linear_vel, angular_vel
 

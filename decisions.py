@@ -40,8 +40,7 @@ class decision_maker(Node):
         self.traj_index = 0
 
         # Instantiate the controller
-        # TODO Part 5: Tune your parameters here
-    
+        # DONE Part 5: Tune your parameters here
         if motion_type == POINT_PLANNER:
             self.controller=controller(klp=0.2, klv=0.1, kli=0.1, kap=0.5, kav=0.6, kai=0.5)
             self.planner=planner(POINT_PLANNER)    
@@ -81,7 +80,7 @@ class decision_maker(Node):
         reached_goal = False
         curr_pose = self.localizer.getPose()
 
-        #Trajectory is of type list, Point is else
+        # Trajectory is of type list, Point is else
         if type(self.goal) == list:
             # Trajectory
             # Check that the linear error and the angular error are within the threshold
@@ -96,7 +95,8 @@ class decision_maker(Node):
                     # Otherwise increment to next point in the trajectory
                     self.traj_index += 1
         else:
-            #Point
+            # Point
+            # Check if the linear error and angulare error are within the desired thresholds
             if (calculate_linear_error(curr_pose, self.goal) < self.threshold_lin and calculate_angular_error(curr_pose, self.goal) < self.threshold_ang):
                 reached_goal = True
         
@@ -109,7 +109,6 @@ class decision_maker(Node):
             self.controller.PID_linear.logger.save_log()
             
             # DONE Part 3: exit the spin
-            # Might be wrong
             raise SystemExit
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
@@ -133,13 +132,14 @@ def main(args=None):
     
     init()
 
-    # DONE Part 3: You migh need to change the QoS profile based on whether you're using the real robot or in simulation.
+    # DONE Part 3: You might need to change the QoS profile based on whether you're using the real robot or in simulation.
     # Remember to define your QoS profile based on the information available in "ros2 topic info /odom --verbose" as explained in Tutorial 3
     
     odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
     
 
     # DONE Part 4: instantiate the decision_maker with the proper parameters for moving the robot
+    # Case if using a point
     if args.motion.lower() == "point":
         # Third argument has an associated assumption in decision_maker class that qos_publisher
         # [1.0, -1.0] is the point we are going towards
@@ -149,7 +149,7 @@ def main(args=None):
                           goalPoint=[1.0, -1.0],
                           rate=10,
                           motion_type=POINT_PLANNER)
-    # DONE Part 4: Tyler added to add instantiating message for trajectory case
+    # Case if using a trajectory
     elif args.motion.lower() == "trajectory":
         DM=decision_maker(publisher_msg=Twist,
                           publishing_topic='/cmd_vel',

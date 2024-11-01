@@ -66,6 +66,7 @@ class PID_ctrl:
             # for example dt=0.1 overwriting the calculation          
             
             # DONE Part 5: calculate the error dot 
+            # Take the current value minus the previous value and divide by the timestep to get slope (aka error dot)
             error_dot+= (self.history[i][0] - self.history[i-1][0]) / dt
             
         error_dot/=len(self.history)
@@ -75,6 +76,7 @@ class PID_ctrl:
         sum_=0
         for hist in self.history:
             # DONE Part 5: Gather the integration
+            # Add the next value
             sum_+= hist[0]
             pass
         
@@ -88,6 +90,7 @@ class PID_ctrl:
             return self.kp*latest_error # complete
         
         # DONE Part 5: Implement the control law corresponding to each type of controller
+        # Each controller is the sum of the error types multiplied by their respective gains
         elif self.type == PD:
             return self.kp*latest_error + self.kv*error_dot # complete
         
