@@ -33,6 +33,7 @@ class planner:
         def func1():
             #Step chosen arbitrarily
             #start=0, stop=1.5, samples=100
+            #stop should be 1.5 but was adjusted to 1.1 for simulation testing
             full_range = linspace(start=0, stop=1.1, num=20)
             return [[i, i**2] for i in full_range]
         
